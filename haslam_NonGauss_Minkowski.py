@@ -35,10 +35,11 @@ if l> l0 , f = 1
 Filter function written in a way that it won't go
 zero sharply but rather in a smooth fashion
 """
-l0 = [10, 20, 40 , 80, 120]
+#l0 = [10, 20, 40 , 80, 120]
+l0 = [10, 30, 50 , 70, 90]
 
 def filter_arr1(ini, final):
-    delta_l = 5
+    delta_l = 10
     window_func = np.zeros(nlmax, dtype=np.float)
     for l in xrange(ini, final):
         if ini + delta_l <= l :
@@ -153,8 +154,10 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
     delta = 0.2
     nu = np.arange(-4, 4., delta)
 
+    S0 = np.zeros( (5, len(nu)-1))
+    S1 = np.zeros( (5, len(nu)-1))
     S2 = np.zeros( (5, len(nu)-1))
-    Ana2 = np.zeros((5,len(nu)-1))
+#    Ana2 = np.zeros((5,len(nu)-1))
 
     ind = (binary_temp_mask==1)
     NPIX = binary_temp_mask[ind]
@@ -173,33 +176,54 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
 
 #+++++++Analytic part+++++++++++++++
 
-            temp = grad_u**2*4
-            mean_ana = np.mean(u)
-            Sig_Sum = (np.mean(u**2) -np.mean(u)**2 )
-            tau_Sum = 0.5*(temp)
-            nu_mean = (nu[j+1]+nu[j])/2.
-            Ana2[l, j] = analaytic_S2(mean_ana, nu_mean, tau_Sum, Sig_Sum)
+#            temp = grad_u**2*4
+#            mean_ana = np.mean(u)
+#            Sig_Sum = (np.mean(u**2) -np.mean(u)**2 )
+#            tau_Sum = 0.5*(temp)
+#            nu_mean = (nu[j+1]+nu[j])/2.
+#            Ana2[l, j] = analaytic_S2(mean_ana, nu_mean, tau_Sum, Sig_Sum)
 
 #+++++++ Data part+++++++++++++++
 
             index = (u  > nu[j])*(u  < nu[j+1])
+            index1 = (u>nu[i])
+            temp1 = u[index1]
+            temp2 = grad_u[index]
             temp3 = kapa_u[index]
+
+            S0[l, j] = (len(temp1))/(NPIX*1.0)
+            S1[l, j] = (np.sum(temp2)/delta)/(NPIX*1.0)
             S2[l, j] = (np.sum(temp3)/delta)/(NPIX*1.0)
 
-    fname1 = 'Gauss_haslam_Minkowski_functional_Anal2_%d.txt' % fn
-    fname2 = 'Gauss_haslam_Minkowski_functional_S2_%d.txt' % fn
 
-    np.save(fname1, zip(Ana2[0,:], Ana2[1,:], Ana2[2,:], Ana2[3,:], Ana2[4,:]),
+
+    fname1 = 'Gauss_haslam_Minkowski_functional_S0_%d.txt' % fn
+    fname2 = 'Gauss_haslam_Minkowski_functional_S1_%d.txt' % fn
+    fname3 = 'Gauss_haslam_Minkowski_functional_S2_%d.txt' % fn
+
+    np.save(fname1, zip(S0[0,:], S0[1,:], S0[2,:], S0[3,:], S0[4,:]),
                     delimiter='\t',
                     fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
                     , header='l_10\tl_20\tl_40\tl_80\t_l_120')
 
 
-    np.save(fname2, zip(S2[0,:], S2[1,:], S2[2,:], S2[3,:], S2[4,:]),
+    np.save(fname2, zip(S1[0,:], S1[1,:], S1[2,:], S1[3,:], S1[4,:]),
                     delimiter='\t',
                     fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
                     , header='l_10\tl_20\tl_40\tl_80\t_l_120')
 
+
+    np.save(fname3, zip(S2[0,:], S2[1,:], S2[2,:], S2[3,:], S2[4,:]),
+                    delimiter='\t',
+                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
+                    , header='l_10\tl_20\tl_40\tl_80\t_l_120')
+
+
+#    fname1 = 'Gauss_haslam_Minkowski_functional_Anal2_%d.txt' % fn
+#    np.save(fname1, zip(Ana2[0,:], Ana2[1,:], Ana2[2,:], Ana2[3,:], Ana2[4,:]),
+#                    delimiter='\t',
+#                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
+#                    , header='l_10\tl_20\tl_40\tl_80\t_l_120')
 
 
 #====================================================================
@@ -215,14 +239,12 @@ def parllel_compute(nmin, nmax, sky_Mask, b_mask):
 
 def main():
 
+    TEMP = '25K'
 
-    TEMP = '60K'
-
-    name = '/jbodstorage/data_sandeep/sandeep/Bispectrum_data/Input_Maps/mask_apod_128/Mask_80K_apod_300arcm_ns_128.fits'
+    name = '/jbodstorage/data_sandeep/sandeep/Bispectrum_data/input_Maps/Mask_80K_apod_300arcm_ns_128.fits'
     Mask_80K = hp.fitsfunc.read_map(name, verbose=False)
 
-
-    f_name1 = "/jbodstorage/data_sandeep/sandeep/Bispectrum_data/Input_Maps/mask_apod_128/Mask_%s_apod_300arcm_ns_128.fits" % TEMP
+    f_name1 = "/jbodstorage/data_sandeep/sandeep/Bispectrum_data/input_Maps/Mask_%s_apod_300arcm_ns_128.fits" % TEMP
     print f_name1
     ap_mask_128 = hp.fitsfunc.read_map(name, verbose=False)
     b_mask = thresh_masking(ap_mask_128)
