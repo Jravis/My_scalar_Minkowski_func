@@ -93,7 +93,7 @@ def Map_Prep(inp_map, Sky_mask, lFilter):
     inp_map = inp_map*Sky_mask
     inp_map_alm = hp.map2alm(inp_map, lmax=nlmax)
 
-    inp_map = hp.alm2map(hp.almxfl(inp_map_alm*lFilter), Nside)
+    inp_map = hp.alm2map(hp.almxfl(inp_map_alm,lFilter), Nside)
 
     inp_map_mean = np.mean(inp_map)
     inp_map_sigma = np.std(inp_map)
@@ -139,7 +139,7 @@ def thresh_masking(inp_mask):
     binary_mask = np.zeros(len(inp_mask))
 
     for ipix in xrange(len(inp_mask)):
-        if inp_mask > 0.998:
+        if inp_mask[ipix] > 0.998:
             binary_mask[ipix]=1
 
 
@@ -204,19 +204,19 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
     np.save(fname1, zip(S0[0,:], S0[1,:], S0[2,:], S0[3,:], S0[4,:]),
                     delimiter='\t',
                     fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
-                    , header='l_10\tl_20\tl_40\tl_80\t_l_120')
+                    , header='l_10\tl_20\tl_40\tl_80\tl_120')
 
 
     np.save(fname2, zip(S1[0,:], S1[1,:], S1[2,:], S1[3,:], S1[4,:]),
                     delimiter='\t',
                     fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
-                    , header='l_10\tl_20\tl_40\tl_80\t_l_120')
+                    , header='l_10\tl_20\tl_40\tl_80\tl_120')
 
 
     np.save(fname3, zip(S2[0,:], S2[1,:], S2[2,:], S2[3,:], S2[4,:]),
                     delimiter='\t',
                     fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
-                    , header='l_10\tl_20\tl_40\tl_80\t_l_120')
+                    , header='l_10\tl_20\tl_40\tl_80\tl_120')
 
 
 #    fname1 = 'Gauss_haslam_Minkowski_functional_Anal2_%d.txt' % fn
