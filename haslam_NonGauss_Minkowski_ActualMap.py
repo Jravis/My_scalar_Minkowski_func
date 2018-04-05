@@ -12,8 +12,8 @@ Jens Schmalzing et. al. 1998
 
 import numpy as np
 import healpy as hp
-from  multiprocessing import Process
 from scipy import special
+import matplotlib.pyplot as plt
 
 
 # Global values
@@ -93,12 +93,7 @@ def Map_Prep(inp_map, Sky_mask, lFilter, indices):
     inp_map = inp_map*Sky_mask
     inp_map_alm = hp.map2alm(inp_map, lmax=nlmax)
 
-    inp_map = hp.alm2map(hp.almxfl(inp_map_alm,lFilter), Nside, verbose=False)
-
-#    inp_map_mean = np.mean(inp_map)
-#    inp_map_sigma = np.std(inp_map)
-
-
+    inp_map = hp.alm2map(hp.almxfl(inp_map_alm,lFilter), Nside)
     temp_inp_map = inp_map[indices]
 
 #    inp_map_mean = np.sum(inp_map[indices])/len(inp_map[indices])
@@ -156,7 +151,7 @@ def thresh_masking(inp_mask):
 
 #====================================================================
 
-def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
+def compute_minkowski(Map, sky_mask, binary_temp_mask):
     """
     """
 
@@ -166,21 +161,12 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
     S0 = np.zeros( (5, len(nu)-1))
     S1 = np.zeros( (5, len(nu)-1))
     S2 = np.zeros( (5, len(nu)-1))
-#    Ana2 = np.zeros((5,len(nu)-1))
 
     ind = (binary_temp_mask==1)
     NPIX = binary_temp_mask[ind]
     NPIX = len(NPIX)
+    print Npix, NPIX
     indxx = (binary_temp_mask!=0)
-
-    temp_mask = np.zeros(len(binary_temp_mask))
-
-    for ipix in xrange(len(binary_temp_mask)):
-        if binary_temp_mask[ipix] > 0:
-            temp_mask[ipix]= 1
-        else:
-            temp_mask[ipix]= -9999
-
 
     for  l in xrange(0, 5):
 
@@ -190,18 +176,27 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
         grad_u *= binary_temp_mask
         kapa_u *= binary_temp_mask
 
+        #hp.mollview(u)
+        #plt.show()
+    #    hp.mollview(grad_u)
+    #    hp.mollview(kapa_u)
+    #    plt.show()
+    #    break
+        temp_mask = np.zeros(len(binary_temp_mask))
+
+        for ipix in xrange(len(binary_temp_mask)):
+            if binary_temp_mask[ipix] > 0:
+                temp_mask[ipix]= 1
+            else:
+                temp_mask[ipix]= -9999
+
         for j in xrange(len(nu)-1):
 
-#+++++++Analytic part+++++++++++++++
-
-#            temp = grad_u**2*4
-#            mean_ana = np.mean(u)
-#            Sig_Sum = (np.mean(u**2) -np.mean(u)**2 )
-#            tau_Sum = 0.5*(temp)
-#            nu_mean = (nu[j+1]+nu[j])/2.
-#            Ana2[l, j] = analaytic_S2(mean_ana, nu_mean, tau_Sum, Sig_Sum)
-
-#+++++++ Data part+++++++++++++++
+            #temp1 =0.
+            #for ipix in xrange(len(binary_temp_mask)):
+            #    if temp_mask[ipix]!= -9999:
+            #        if u[ipix] > nu[j]:
+            #            temp1+=1
 
 
             valid_inices = (temp_mask!=-9999)
@@ -209,6 +204,7 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
             index1 = (u1 > nu[j])
             temp1 = u1[index1]
             S0[l, j] = len(temp1)/(NPIX*1.0)
+
 
             index = (u  > nu[j])*(u  < nu[j+1])
             temp2 = grad_u[index]
@@ -219,74 +215,48 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
 
 
 
-    fname1 = 'Mink_Gaussian_New_25K/Gauss_haslam_Minkowski_functional_S0_%d.txt' % fn
-    fname2 = 'Mink_Gaussian_New_25K/Gauss_haslam_Minkowski_functional_S1_%d.txt' % fn
-    fname3 = 'Mink_Gaussian_New_25K/Gauss_haslam_Minkowski_functional_S2_%d.txt' % fn
+    fname1 = 'haslam_25K_Minkowski_functional_S0.txt'
+    fname2 = 'haslam_25K_Minkowski_functional_S1.txt'
+    fname3 = 'haslam_25K_Minkowski_functional_S2.txt'
 
     np.savetxt(fname1, zip(S0[0,:], S0[1,:], S0[2,:], S0[3,:], S0[4,:]),
-                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e',
-                    delimiter='\t', header='l_10\tl_20\tl_40\tl_80\tl_120')
+                    delimiter='\t',
+                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
+                    , header='l_10\tl_30\tl_50\tl_70\tl_90')
 
 
     np.savetxt(fname2, zip(S1[0,:], S1[1,:], S1[2,:], S1[3,:], S1[4,:]),
-                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e',
-                    delimiter='\t', header='l_10\tl_20\tl_40\tl_80\tl_120')
+                    delimiter='\t',
+                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
+                    , header='l_10\tl_30\tl_50\tl_70\tl_90')
 
 
     np.savetxt(fname3, zip(S2[0,:], S2[1,:], S2[2,:], S2[3,:], S2[4,:]),
-                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e',
-                    delimiter='\t', header='l_10\tl_20\tl_40\tl_80\tl_120')
-
-
-#    fname1 = 'Gauss_haslam_Minkowski_functional_Anal2_%d.txt' % fn
-#    np.save(fname1, zip(Ana2[0,:], Ana2[1,:], Ana2[2,:], Ana2[3,:], Ana2[4,:]),
-#                    delimiter='\t',
-#                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
-#                    , header='l_10\tl_20\tl_40\tl_80\t_l_120')
+                    delimiter='\t',
+                    fmt='%0.6e\t%0.6e\t%0.6e\t%0.6e\t%0.6e'
+                    , header='l_10\tl_30\tl_50\tl_70\tl_90')
 
 
 #====================================================================
 
-def parllel_compute(nmin, nmax, sky_Mask, b_mask):
-
-
-    for nn in xrange(nmin, nmax):
-        filename = 'Gaussian_25K_Maps/haslam_gaussMap_25K_%d.fits'%nn
-        compute_minkowski(hp.read_map(filename), sky_Mask, b_mask, nn)
-
-#====================================================================
 
 def main():
 
     TEMP = '25K'
 
-    #name = '/jbodstorage/data_sandeep/sandeep/Bispectrum_data/input_Maps/Mask_80K_apod_300arcm_ns_128.fits'
     name = '../Mask_80K_apod_300arcm_ns_128.fits'
     Mask_80K = hp.fitsfunc.read_map(name, verbose=False)
 
-    #f_name1 = "/jbodstorage/data_sandeep/sandeep/Bispectrum_data/input_Maps/Mask_%s_apod_300arcm_ns_128.fits" % TEMP
     f_name1 = "../Mask_%s_apod_300arcm_ns_128.fits" % TEMP
     print f_name1
     ap_mask_128 = hp.fitsfunc.read_map(f_name1, verbose=False)
     b_mask = thresh_masking(ap_mask_128)
 
-    max_core = 1
-    count=0
-    increment = 1000
-    jobs = []
-
-    for i in xrange(0, max_core):
-        nmin = count
-        nmax = count + increment
-        if nmax == 1000:
-            nmax = 1001
-        s = Process(target=parllel_compute, args=(nmin, nmax, Mask_80K, b_mask))
-        jobs.append(s)
-        s.start()
-        count = nmax
-
-    for s in jobs:
-        s.join()
+    f_name = "../haslam408_dsds_Remazeilles2014.fits"
+    haslam_512 = hp.fitsfunc.read_map(f_name)
+    # Degrading Haslam from Nside 512 to 128
+    haslam_128 = hp.pixelfunc.ud_grade(haslam_512, nside_out=128)
+    compute_minkowski(haslam_128, Mask_80K, b_mask)
 
 
 if __name__ == "__main__":
