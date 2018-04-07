@@ -1,3 +1,32 @@
+#############################################################################
+#Copyright (c) 2017, Sandeep Rana & Tuhin Ghosh
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without
+#modification, are permitted provided that the following conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice,
+#      this list of conditions and the following disclaimer.
+#   Redistributions in binary form must reproduce the above copyright notice,
+#      this list of conditions and the following disclaimer in the
+#      documentation and/or other materials provided with the distribution.
+#   The name of the author may not be used to endorse or promote products
+#      derived from this software without specific prior written permission.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+#HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+#OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+#AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+#WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#POSSIBILITY OF SUCH DAMAGE.
+#############################################################################
+
 """
 Code for testing non-Gaussian
 features in a map using scalar
@@ -6,14 +35,12 @@ See "Minkowski functionals used in
 the morphological analysis of cosmic
 microwave background anisotropy maps"
 Jens Schmalzing et. al. 1998
-
-@Author Sandeep Rana & Tuhin Ghosh
 """
+
 
 import numpy as np
 import healpy as hp
 from scipy import special
-import matplotlib.pyplot as plt
 
 
 # Global values
@@ -35,7 +62,6 @@ if l> l0 , f = 1
 Filter function written in a way that it won't go
 zero sharply but rather in a smooth fashion
 """
-#l0 = [10, 20, 40 , 80, 120]
 l0 = [10, 30, 50 , 70, 90]
 
 def filter_arr1(ini, final):
@@ -176,12 +202,6 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask):
         grad_u *= binary_temp_mask
         kapa_u *= binary_temp_mask
 
-        #hp.mollview(u)
-        #plt.show()
-    #    hp.mollview(grad_u)
-    #    hp.mollview(kapa_u)
-    #    plt.show()
-    #    break
         temp_mask = np.zeros(len(binary_temp_mask))
 
         for ipix in xrange(len(binary_temp_mask)):
@@ -191,13 +211,6 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask):
                 temp_mask[ipix]= -9999
 
         for j in xrange(len(nu)-1):
-
-            #temp1 =0.
-            #for ipix in xrange(len(binary_temp_mask)):
-            #    if temp_mask[ipix]!= -9999:
-            #        if u[ipix] > nu[j]:
-            #            temp1+=1
-
 
             valid_inices = (temp_mask!=-9999)
             u1 = u[valid_inices]
