@@ -94,7 +94,7 @@ if l> l0 , f = 1
 Filter function written in a way that it won't go
 zero sharply but rather in a smooth fashion
 """
-l0 = [10, 30, 50 , 70, 90]
+l0 = [30, 50 , 70, 90]
 
 def filter_arr2(ini, final):
     """
@@ -104,11 +104,13 @@ def filter_arr2(ini, final):
     delta_l = 5
     window_func = np.zeros(nlmax, dtype=np.float)
 
-    for l in xrange(ini, final):
-        if ini + delta_l <= l :
-            window_func[l] = 1.0
-        elif ini <= l < ini + delta_l:
-            window_func[l] = (np.tanh(np.pi*(l-ini) / delta_l))
+    #for l in xrange(ini, final):
+    for l in xrange(0, final):
+#        if ini + delta_l <= l :
+#            window_func[l] = 1.0
+#        elif ini <= l < ini + delta_l:
+#            window_func[l] = (np.tanh(np.pi*(l-ini) / delta_l))
+        window_func[l] = 0.5*(1.+np.tanh((l-ini) / (delta_l*1.0)))
     return window_func
 
 
@@ -143,7 +145,7 @@ def analaytic_S2(mean_g, x, tau, Sigma):
 #++++++++++++++ End analytical Form of Scalar Minkowski ++++++
 
 
-def Map_Prep(inp_map, Sky_mask, lFilter, indices):
+def Map_Prep(inp_map, Sky_mask, lFilter, indices, bmask):
     """
     # Map prepration
     param1 :- Input Map
@@ -159,18 +161,13 @@ def Map_Prep(inp_map, Sky_mask, lFilter, indices):
 
     inp_map = hp.alm2map(hp.almxfl(inp_map_alm,lFilter), Nside, verbose=False)
 
-#    inp_map_mean = np.mean(inp_map)
-#    inp_map_sigma = np.std(inp_map)
-
-
     temp_inp_map = inp_map[indices]
 
-#    inp_map_mean = np.sum(inp_map[indices])/len(inp_map[indices])
-    #inp_map_sigma = np.sqrt( np.sum( (inp_map[indices]-inp_map_mean)**2.) / (len(inp_map[indices]) - 1) )
     inp_map_mean = np.mean(temp_inp_map)
     inp_map_sigma = np.std(temp_inp_map)
 
 
+    inp_map *=bmask
     g_map = (inp_map-inp_map_mean)/inp_map_sigma # we calling it g_map where in Jens Schmalzing et. al. 1998 its u(generic scalar field)
 
     g_alm = hp.sphtfunc.map2alm(g_map, lmax=nlmax)
@@ -243,15 +240,7 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
     indd = binary_temp_mask <= 0
     temp_mask[indd]= -9999
 
-
-    #for ipix in xrange(len(binary_temp_mask)):
-    #    if binary_temp_mask[ipix] > 0:
-    #        temp_mask[ipix]= 1
-    #    else:
-    #        temp_mask[ipix]= -9999
-
-
-    for  l in xrange(0, 5):
+    for  l in xrange(0, 4):
 
         u, grad_u, kapa_u = Map_Prep(Map, sky_mask, window_func_filter2[l, :], indxx)
 
