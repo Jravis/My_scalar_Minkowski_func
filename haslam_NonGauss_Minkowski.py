@@ -232,17 +232,16 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask, fn):
     ind = (binary_temp_mask==1)
     NPIX = binary_temp_mask[ind]
     NPIX = len(NPIX)
-    indxx = (binary_temp_mask!=0)
 
     temp_mask = np.zeros(len(binary_temp_mask))
-    indd = binary_temp_mask > 0
+    indd = (binary_temp_mask > 0)
     temp_mask[indd]= 1
-    indd = binary_temp_mask <= 0
+    indd = (binary_temp_mask <= 0)
     temp_mask[indd]= -9999
 
     for  l in xrange(0, 4):
 
-        u, grad_u, kapa_u = Map_Prep(Map, sky_mask, window_func_filter2[l, :], indxx)
+        u, grad_u, kapa_u = Map_Prep(Map, sky_mask, window_func_filter2[l, :], ind, binary_temp_mask)
 
         u     *= binary_temp_mask
         grad_u *= binary_temp_mask

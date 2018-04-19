@@ -62,7 +62,7 @@ if l> l0 , f = 1
 Filter function written in a way that it won't go
 zero sharply but rather in a smooth fashion
 """
-l0 = [10, 30, 50 , 70, 90]
+l0 = [30, 50 , 70, 90]
 
 def filter_arr1(ini, final):
     delta_l = 10
@@ -231,28 +231,24 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask):
     ind = (binary_temp_mask==1)
     NPIX = binary_temp_mask[ind]
     NPIX = len(NPIX)
-    print "Npix, NPIX"
-    print  Npix, NPIX
 
-    for  l in xrange(0, 5):
-        print l0[l]
+    temp_mask = np.zeros(len(binary_temp_mask))
+    indd = (binary_temp_mask > 0)
+    temp_mask[indd]= 1
+    indd = (binary_temp_mask <= 0)
+    temp_mask[indd]= -9999
+
+
+
+    for  l in xrange(0, 4):
         u, grad_u, kapa_u = Map_Prep(Map, sky_mask, window_func_filter2[l, :], ind, binary_temp_mask)
 
         u     *= binary_temp_mask
         grad_u *= binary_temp_mask
         kapa_u *= binary_temp_mask
-
-        temp_mask = np.zeros(len(binary_temp_mask))
-
-        indd = binary_temp_mask > 0
-        temp_mask[indd]= 1
-        indd = binary_temp_mask <= 0
-        temp_mask[indd]= -9999
-
-        #for ipix in xrange(len(binary_temp_mask)):
+            #for ipix in xrange(len(binary_temp_mask)):
             #if binary_temp_mask[ipix] > 0:
             #else:
-
         for j in xrange(len(nu)):
 
             valid_inices = (temp_mask!=-9999)
