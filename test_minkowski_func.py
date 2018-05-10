@@ -2,12 +2,37 @@ import numpy as np
 import healpy as hp
 import matplotlib.pyplot as plt
 from scipy import special
+from matplotlib.colors import ListedColormap
+#matplotlib.use("agg")
+colombi1_cmap = ListedColormap(np.loadtxt("Planck_Parchment_RGB.txt")/255.)
+colombi1_cmap.set_bad("gray") # color of missing pixels
+colombi1_cmap.set_under("white") # color of background, necessary if you want to use
+# this colormap directly with hp.mollview(m, cmap=colombi1_cmap)
+cmap_planck = colombi1_cmap
 
+import matplotlib
+matplotlib.use("Agg")
 Nside =512
 
 cl = hp.fitsfunc.read_cl("cl.fits")
 
 gauss_map = hp.synfast(cl[0], 512, lmax=3*Nside-1, fwhm=0, pixwin=True, verbose=False, pol=False)
+
+
+dpi = 800
+fig_size_inch = 6, 4.5
+fig = plt.figure(1, figsize=(6, 4.5))
+
+hp.mollview(gauss_map, fig=fig.number, xsize=2000, nest=False,
+             title='', cmap=cmap_planck, cbar=False)
+
+plt.savefig('Gaussian', dpi=800, bbox_inches="tight", pad_inches = 0)
+
+plt.show()
+
+
+
+
 
 def analaytic_S2(mean_g, x, tau, Sigma):
 
@@ -120,63 +145,65 @@ for i in xrange(len(nu)-1):
 plt.style.use('classic')
 
 plt.figure(1, figsize=(8, 6))
-plt.plot(nu[:-1], SO, 'o' , color='orange', alpha=0.8, label=r'$Data$')
-plt.plot(nu[:-1], Ana0, linestyle='-' , color='orange',linewidth=3, alpha=0.5, label=r'$Analytical$')
+plt.plot(nu[:-1], SO, 'o' , color='purple', alpha=0.8, label=r'$Data$', ms='8', mfc=None, mew=2.5,mec='purple')
+plt.plot(nu[:-1], Ana0, linestyle='-' , color='purple',linewidth=3, alpha=0.5, label=r'$Analytical$')
 
-plt.legend(loc=2, fontsize=14, frameon=False)
+plt.legend(loc=1, fontsize=20, frameon=False)
 plt.minorticks_on()
 plt.ylim(-0.001, 1.05)
-plt.xlabel(r'$S_{1}$', fontsize=14)
-plt.ylabel(r'$\nu$', fontsize=14)
-plt.tick_params(axis='both', which='minor', length=4, width=2, labelsize=12)
-plt.tick_params(axis='both', which='major', length=8, width=3, labelsize=12)
-plt.tick_params(which='major', length=8, width=3, labelsize=12, right='on')
-plt.tick_params(which='minor', length=4, width=2, labelsize=12, right='on')
-plt.tick_params(which='minor', length=4, width=2, labelsize=12, top='on')
-plt.tick_params(which='major', length=8, width=3, labelsize=12, top='on')
+plt.ylabel(r'$S_{0}$', fontsize=20)
+plt.xlabel(r'$\nu$', fontsize=20)
+plt.tick_params(axis='both', which='minor', length=4, width=2, labelsize=15)
+plt.tick_params(axis='both', which='major', length=8, width=3, labelsize=15)
+plt.tick_params(which='major', length=8, width=3, labelsize=15, right='on')
+plt.tick_params(which='minor', length=4, width=2, labelsize=15, right='on')
+plt.tick_params(which='minor', length=4, width=2, labelsize=15, top='on')
+plt.tick_params(which='major', length=8, width=3, labelsize=15, top='on')
 plt.tight_layout()
 
-plt.savefig("S0.png", dpi=800)
+plt.savefig("S0", dpi=800)
 
 
 
 
 plt.figure(2, figsize=(8, 6))
-plt.plot(nu[:-1], S1, 'b o' , color='teal', alpha=0.8, label=r'$Data$')
+plt.plot(nu[:-1], S1, 'b o' , color='teal', alpha=0.8, label=r'$Data$', ms='8', mfc=None, mew=2.5,mec='teal')
 plt.plot(nu[:-1], Ana1, linestyle='-' , color='g',linewidth=3, alpha=0.5, label=r'$Analytical$')
-plt.legend(loc=2, fontsize=14, frameon=False)
+plt.legend(loc=2, fontsize=20, frameon=False)
 plt.minorticks_on()
-plt.xlabel(r'$S_{1}$', fontsize=14)
-plt.ylabel(r'$\nu$', fontsize=14)
-plt.tick_params(axis='both', which='minor', length=4, width=2, labelsize=12)
-plt.tick_params(axis='both', which='major', length=8, width=3, labelsize=12)
-plt.tick_params(which='major', length=8, width=3, labelsize=12, right='on')
-plt.tick_params(which='minor', length=4, width=2, labelsize=12, right='on')
-plt.tick_params(which='minor', length=4, width=2, labelsize=12, top='on')
-plt.tick_params(which='major', length=8, width=3, labelsize=12, top='on')
+plt.ylabel(r'$S_{1}$', fontsize=20)
+plt.xlabel(r'$\nu$', fontsize=20)
+plt.tick_params(axis='both', which='minor', length=4, width=2, labelsize=15)
+plt.tick_params(axis='both', which='major', length=8, width=3, labelsize=15)
+plt.tick_params(which='major', length=8, width=3, labelsize=15, right='on')
+plt.tick_params(which='minor', length=4, width=2, labelsize=15, right='on')
+plt.tick_params(which='minor', length=4, width=2, labelsize=15, top='on')
+plt.tick_params(which='major', length=8, width=3, labelsize=15, top='on')
 plt.tight_layout()
 
 
-plt.savefig("S1.png", dpi=800)
+plt.savefig("S1", dpi=800)
 
 
 plt.figure(3, figsize=(8, 6))
-plt.plot(nu[:-1], S2, 'b o' , color='crimson', alpha=0.8, label=r'Data')
+plt.plot(nu[:-1], S2, 'b o' , color='crimson', alpha=0.8, label=r'Data', ms='8', mfc=None, mew=2.5,mec='crimson')
+
 plt.plot(nu[:-1], Ana2, linestyle='-' , color='crimson', linewidth=3, alpha=0.5, label=r'Analytical')
-plt.legend(loc=2, fontsize=14, frameon=False)
+plt.legend(loc=2, fontsize=20, frameon=False)
 plt.minorticks_on()
-plt.xlabel(r'$S_{2}$', fontsize=14)
-plt.ylabel(r'$\nu$', fontsize=14)
-plt.tick_params(axis='both', which='minor', length=4, width=2, labelsize=12)
-plt.tick_params(axis='both', which='major', length=8, width=3, labelsize=12)
-plt.tick_params(which='major', length=8, width=3, labelsize=12, right='on')
-plt.tick_params(which='minor', length=4, width=2, labelsize=12, right='on')
-plt.tick_params(which='minor', length=4, width=2, labelsize=12, top='on')
-plt.tick_params(which='major', length=8, width=3, labelsize=12, top='on')
+plt.ylabel(r'$S_{2}$', fontsize=20)
+plt.xlabel(r'$\nu$', fontsize=20)
+plt.tick_params(axis='both', which='minor', length=4, width=2, labelsize=15)
+plt.tick_params(axis='both', which='major', length=8, width=3, labelsize=15)
+plt.tick_params(which='major', length=8, width=3, labelsize=15, right='on')
+plt.tick_params(which='minor', length=4, width=2, labelsize=15, right='on')
+plt.tick_params(which='minor', length=4, width=2, labelsize=15, top='on')
+plt.tick_params(which='major', length=8, width=3, labelsize=15, top='on')
 plt.tight_layout()
 
-plt.savefig("S2.png", dpi=800)
+plt.savefig("S2", dpi=800)
 
 
 
 plt.show()
+

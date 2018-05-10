@@ -267,7 +267,6 @@ def compute_minkowski(Map, sky_mask, binary_temp_mask):
             S1[l, j] = (np.sum(temp2)/delta)/(NPIX*1.0)
             S2[l, j] = (np.sum(temp3)/delta)/(NPIX*1.0)
 
-            print S1[l, j], S2[l, j]
 
     fname1 = 'New_filter/haslam_25K_Minkowski_functional_S0.txt'
     fname2 = 'New_filter/haslam_25K_Minkowski_functional_S1.txt'
